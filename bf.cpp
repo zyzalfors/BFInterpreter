@@ -58,25 +58,29 @@ int interpret(const char* path, const size_t data_size) {
 
     if(mismpar(firstip, lastip, '[', ']')) return 2;
 
-    std::vector<char> data(data_size, 0);
-    const char* firstdp = data.data();
-    const char* lastdp = firstdp + data.size() - 1;
-    char* dp = (char*) firstdp;
+    std::vector<uint8_t> data(data_size, 0);
+    const uint8_t* firstdp = data.data();
+    const uint8_t* lastdp = firstdp + data.size() - 1;
+    uint8_t* dp = (uint8_t*) firstdp;
 
     int err = 0;
+    int input = 0;
     while(ip <= lastip) {
         if(*ip == '>') {
             if(dp < lastdp) dp++;
-            else dp = (char*) firstdp;
+            else dp = (uint8_t*) firstdp;
         }
         else if(*ip == '<') {
             if(dp > firstdp) dp--;
-            else dp = (char*) lastdp;
+            else dp = (uint8_t*) lastdp;
         }
         else if(*ip == '+') (*dp)++;
         else if(*ip == '-') (*dp)--;
         else if(*ip == '.') std::printf("%c", *dp);
-        else if(*ip == ',') std::cin >> *dp;
+        else if(*ip == ',') {
+            std::cin >> std::hex >> input;
+            *dp = input;
+        }
         else if(*ip == '[' && !*dp) moveip(&ip, 1, firstip, lastip, '[', ']');
         else if(*ip == ']' && *dp) moveip(&ip, -1, firstip, lastip, ']', '[');
 
