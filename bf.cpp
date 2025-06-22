@@ -22,12 +22,12 @@ void moveip(char** ipp, const int dir, const char* from, const char* to, const c
     }
 }
 
-int mismpar(const char* firstip, const char* lastip, const char open, const char close) {
+bool mismpar(const char* firstip, const char* lastip, const char open, const char close) {
     int64_t mism = 0;
 
     for(char* ip = (char*) firstip; ip <= lastip; ip++) {
         if(*ip == open) mism++;
-        if(*ip == close && mism == 0) return 1;
+        if(*ip == close && mism == 0) return true;
         if(*ip == close) mism--;
     }
 
