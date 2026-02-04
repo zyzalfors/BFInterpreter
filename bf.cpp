@@ -1,19 +1,20 @@
 #include <cstdio>
 #include <cstdlib>
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <string>
 #define SIZE 30000
 
-void moveip(char** ipp, const int dir, const char* from, const char* to, const char open, const char close) {
-    int64_t mism = 1;
+void move_ip(char** ipp, const int& dir, const char* from, const char* to, const char& open, const char& close) {
+    std::int64_t mism = 1;
 
     while(mism > 0) {
         *ipp += dir;
 
         if(*ipp < from || *ipp > to) {
-            *ipp = NULL;
+            *ipp = nullptr;
             return;
         }
 
@@ -22,10 +23,10 @@ void moveip(char** ipp, const int dir, const char* from, const char* to, const c
     }
 }
 
-bool mismpar(const char* firstip, const char* lastip, const char open, const char close) {
-    int64_t mism = 0;
+bool mism_par(const char* first_ip, const char* last_ip, const char& open, const char& close) {
+    std::int64_t mism = 0;
 
-    for(char* ip = (char*) firstip; ip <= lastip; ip++) {
+    for(char* ip = (char*) first_ip; ip <= last_ip; ip++) {
         if(*ip == open) mism++;
         if(*ip == close && mism == 0) return true;
         if(*ip == close) mism--;
@@ -38,7 +39,7 @@ void read(const char* path, std::string& ist) {
     std::ifstream file(path);
     if(!file.is_open()) return;
 
-    char c;
+    char c = 0;
     while(file.get(c)) {
         if(c != '>' && c != '<' && c != '+' && c != '-' && c != '.' && c != ',' && c != '[' && c != ']') continue;
         ist += c;
@@ -47,32 +48,32 @@ void read(const char* path, std::string& ist) {
     file.close();
 }
 
-int interpret(const char* path, const size_t data_size) {
+int interpret(const char* path, const std::size_t& size) {
     std::string ist;
     read(path, ist);
+
     if(ist.empty()) return 1;
 
-    const char* firstip = ist.data();
-    const char* lastip = firstip + ist.size() - 1;
-    char* ip = (char*) firstip;
+    const char* first_ip = ist.data();
+    const char* last_ip = first_ip + ist.size() - 1;
+    char* ip = (char*) first_ip;
 
-    if(mismpar(firstip, lastip, '[', ']')) return 2;
+    if(mism_par(first_ip, last_ip, '[', ']')) return 2;
 
-    std::vector<uint8_t> data(data_size, 0);
-    const uint8_t* firstdp = data.data();
-    const uint8_t* lastdp = firstdp + data.size() - 1;
-    uint8_t* dp = (uint8_t*) firstdp;
+    std::vector<std::uint8_t> data(size, 0);
+    const std::uint8_t* first_dp = data.data();
+    const std::uint8_t* last_dp = first_dp + data.size() - 1;
+    std::uint8_t* dp = (std::uint8_t*) first_dp;
 
-    int err = 0;
     int input = 0;
-    while(ip <= lastip) {
+    while(ip <= last_ip) {
         if(*ip == '>') {
-            if(dp < lastdp) dp++;
-            else dp = (uint8_t*) firstdp;
+            if(dp < last_dp) dp++;
+            else dp = (std::uint8_t*) first_dp;
         }
         else if(*ip == '<') {
-            if(dp > firstdp) dp--;
-            else dp = (uint8_t*) lastdp;
+            if(dp > first_dp) dp--;
+            else dp = (std::uint8_t*) last_dp;
         }
         else if(*ip == '+') (*dp)++;
         else if(*ip == '-') (*dp)--;
@@ -81,16 +82,16 @@ int interpret(const char* path, const size_t data_size) {
             std::cin >> std::hex >> input;
             *dp = input;
         }
-        else if(*ip == '[' && !*dp) moveip(&ip, 1, firstip, lastip, '[', ']');
-        else if(*ip == ']' && *dp) moveip(&ip, -1, firstip, lastip, ']', '[');
+        else if(*ip == '[' && !*dp) move_ip(&ip, 1, first_ip, last_ip, '[', ']');
+        else if(*ip == ']' && *dp) move_ip(&ip, -1, first_ip, last_ip, ']', '[');
 
         ip++;
     }
 
-    return err;
+    return 0;
 }
 
-void print_err(int err) {
+void print_err(const int& err) {
     switch(err) {
         case 1:
             std::cout << "Error: unable to read code\n";
@@ -105,9 +106,9 @@ void print_err(int err) {
 int main(int argc, char* argv[]) {
     if(argc < 2) return 0;
 
-    size_t data_size = argc > 2 ? std::strtol(argv[2], NULL, 10) : SIZE;
-    if(!data_size) data_size = SIZE;
+    std::size_t size = argc > 2 ? std::strtoul(argv[2], NULL, 10) : SIZE;
+    if(size == 0) size = SIZE;
 
-    print_err(interpret(argv[1], data_size));
+    print_err(interpret(argv[1], size));
     return 0;
 }
