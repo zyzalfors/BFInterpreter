@@ -40,10 +40,8 @@ void read(const char* path, std::string& ist) {
     if(!file.is_open()) return;
 
     char c = 0;
-    while(file.get(c)) {
-        if(c != '>' && c != '<' && c != '+' && c != '-' && c != '.' && c != ',' && c != '[' && c != ']') continue;
-        ist += c;
-    }
+    while(file.get(c))
+        if(c == '>' || c == '<' || c == '+' || c == '-' || c == '.' || c == ',' || c == '[' || c == ']') ist += c;
 
     file.close();
 }
@@ -65,25 +63,30 @@ int interpret(const char* path, const std::size_t& size) {
     const std::uint8_t* last_dp = first_dp + data.size() - 1;
     std::uint8_t* dp = (std::uint8_t*) first_dp;
 
-    int input = 0;
+    std::uint16_t input = 0;
     while(ip <= last_ip) {
         if(*ip == '>') {
             if(dp < last_dp) dp++;
-            else dp = (std::uint8_t*) first_dp;
+            else
+                dp = (std::uint8_t*) first_dp;
         }
         else if(*ip == '<') {
             if(dp > first_dp) dp--;
-            else dp = (std::uint8_t*) last_dp;
+            else
+                dp = (std::uint8_t*) last_dp;
         }
         else if(*ip == '+') (*dp)++;
         else if(*ip == '-') (*dp)--;
-        else if(*ip == '.') std::printf("%c", *dp);
+        else if(*ip == '.')
+            std::printf("%c", *dp);
         else if(*ip == ',') {
             std::cin >> std::hex >> input;
             *dp = input;
         }
-        else if(*ip == '[' && !*dp) move_ip(&ip, 1, first_ip, last_ip, '[', ']');
-        else if(*ip == ']' && *dp) move_ip(&ip, -1, first_ip, last_ip, ']', '[');
+        else if(*ip == '[' && !*dp)
+            move_ip(&ip, 1, first_ip, last_ip, '[', ']');
+        else if(*ip == ']' && *dp)
+            move_ip(&ip, -1, first_ip, last_ip, ']', '[');
 
         ip++;
     }
